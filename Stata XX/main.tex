@@ -1,0 +1,45 @@
+\input{Preamble_AER_XX}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{positioning}
+\usetikzlibrary{arrows.meta}
+
+
+% Load numbers saved by latexnum_v2.ado
+\input{Output/Tables/tex_nums}
+
+\title{ \vspace{-0.4in} \textbf{\uppercase{\LARGE{For Stata and Beyond: A Pretty Harmless Guide to Doing Research with Stata}}}\thanks{This guide is by no means original. It draws heavily from the RA guide of Neale Mahoney’s lab, and is supplemented with lessons picked up from the Gentzkow{\&}Shapiro Lab’s online repository (\url{https://github.com/gslab-econ}) and from reading code written by my incredible mentors, colleagues, coauthors, and friends. Special thanks to Hanbin Yang and Yuci Zhou, from whose code I learned a good deal of useful dirty tricks. All errors are my own.}}
+
+\author{
+	\uppercase{Xuyang Xia} \thanks{Duke University. Email: \href{mailto:xuyang.xia@duke.edu}{xuyang.xia@duke.edu}.} 
+}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\thispagestyle{empty} 
+\setcounter{page}{0}
+\vspace{-12pt}
+% \input{abstract.tex}
+
+\clearpage
+\input{intro.tex}
+\input{folder_structure.tex}
+\input{stata.tex}
+\input{latex.tex}
+\input{other.tex}
+\newpage
+\vspace{16pt}
+
+\singlespacing 
+\noindent\textit{The reference list below is not complete. Most references are inserted in the main text. A few are listed below, mainly to showcase how to add references in {\LaTeX.}}
+\bibliographystyle{te}
+\bibliography{references}
+\onehalfspacing
+
+% \newpage
+% \input{appendix}
+
+
+
+
+\end{document}

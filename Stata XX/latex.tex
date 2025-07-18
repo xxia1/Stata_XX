@@ -1,0 +1,63 @@
+\section{Some {\LaTeX} Tricks}
+This file itself is produced by {\LaTeX}, so the script already covers most essential tools one needs to produce a report or draft. In this section, I just introduce you to a couple of tricks that may make your life easier. 
+
+\subsection{Write ``Functions'' in {\LaTeX}}
+This trick only uses two basic {\LaTeX} commands: \verb|\newcommand| and \verb|\renewcommand|. Basically, what they do is replace any text with a shorter command. E.g., 
+\begin{verbatim}
+    \newcommand{\jobtitle}{Coordinator of Rapid Rupture}
+\end{verbatim}
+uses the command \verb|\jobtitle| to represent the whole phrase \verb|Coordinator of Rapid Rupture|. Then later in the script, every time the compiler sees \verb|\jobtitle|, it will treat it as if the full phrase is written there. Very similar to macro names in Stata, this replacement is quite literal. 
+
+How can this help us? The key is that the text to be replaced can be anything. It can be very long, contain multiple lines, and be embedded with other commands. This allows us to set up a ``function'' with input, which can be used repeatedly without typing the whole piece of code again and again. 
+
+\textbf{OK, now I highly recommend that you go to the {\LaTeX} script in the companion repository}, and open the \verb|latex.tex| file to read the following passage, otherwise it'd get very confusing.
+
+For example, I have a set of figures that are similar but use different specifications. I want to insert them in different places in the report. The piece of code for using and describing them is quite similar. Instead of copying the whole thing over every time I use one of these figures, I can do:
+\newcommand{\figversion}{}
+\newcommand{\figname}{}
+\newcommand{\makeplot}{
+    The figure below maps the population share of people over 65 in each state, where states are drawn in \figname.
+    \begin{figure}[H]
+        \caption{\% Population >65yo Map, \figname}
+        %\label{fig:enter-label}
+        \begin{center}
+            \includegraphics[width=0.5\linewidth]{Output/Figures/map\figversion.png}
+        \end{center}
+    \end{figure}
+}
+The code above initializes two input commands, \verb|\figversion| and \verb|figname|, and encapsulates the whole piece of code to draw a figure, along with a line of text describing that figure, into the command \verb|\makeplot|. Then, when I want to plot the first version, I just need to do:
+
+\renewcommand{\figversion}{1} % Assign values to the input
+\renewcommand{\figname}{regular shapes}
+\makeplot % Run the ``function''
+
+And another version:
+
+\renewcommand{\figversion}{2} % Assign values to the input
+\renewcommand{\figname}{hexagons}
+\makeplot % Run the ``function''
+
+What's also nice is that I can standardize the look of all these parts. E.g., if I want to make all these figures smaller, I only need to make adjustments inside the definition of \verb|\makeplot|, instead of finding each figure and adjusting it one by one. 
+
+You can literally put anything inside the ``function'', and come up with creative ways to use this trick. 
+
+\subsection{Loops}
+Yes, you can write loops in {\LaTeX}, and it's in fact very easy to use and quite powerful. What's especially dope about the loop in {\LaTeX} is that it allows you to loop over more than one object at the same time. Here is an example:
+
+\foreach \figversion/\figname in {1/regular shapes, 2/hexagons}{
+    The figure below maps the population share of people over 65 in each state, where states are drawn in \figname.
+    \begin{figure}[H]
+        \caption{\% Population >65yo Map, \figname}
+        %\label{fig:enter-label}
+        \begin{center}
+            \includegraphics[width=0.5\linewidth]{Output/Figures/map\figversion.png}
+        \end{center}
+    \end{figure}
+}
+
+You can add even more objects to loop over, separated by \verb|/|. All objects from the same group/iteration are used at the same time inside the loop. And you can, of course, add loops inside loops, run functions in the loops, etc. Again, this feature is very similar to Stata's macro names; you can now write code with code, and write scripts with scripts. Once things get \textit{meta}, many funky usages become possible. 
+
+
+
+
+
