@@ -24,6 +24,8 @@ decode region, gen(region_str) // convert the categorical variable "region" into
 replace region_str = "Northeast" if region_str=="NE"
 replace region_str = "North Central" if region_str=="N Cntrl"
 
+// drop if region_str=="Northeast"
+
 **# Save numbers into LaTex commands using latexnum_v2
 unique state
 latexnum_v2 using "${TEXTFILE}", ///
@@ -137,6 +139,133 @@ twoway (scatter pop65p_share popurban_share [w=pop], m(Oh) mlc(blue%70) ///
 		, ///
 		xtitle("Urban Population Share (%)") ytitle(">65 yo Population Share (%)") 
 graph export "$outputpath/Figures/scatter2.png", replace 
+
+
+**# Scatter plot with marginal distribution
+loc xvar = "popurban_share"
+loc xvartext = "Urban Pop Share (%)"
+loc xvarrange = "40(20)100"
+
+loc yvar = "pop65p_share"
+loc yvartext = ">65yo Pop Share"
+loc yvarrange = "0(5)20"
+
+// loc xvar = "pop5_17_share"
+// loc xvartext = "5-17yo Share (%)"
+// loc xvarrange = "15(5)25"
+
+// loc yvar = "pop18p_share"
+// loc yvartext = ">18yo Pop Share"
+// loc yvarrange = "60(5)80"
+
+qui su `xvar', de 
+loc xmed = round(`r(p50)',0.1)
+qui su `yvar', de 
+loc ymed = round(`r(p50)', 0.1)
+twoway (scatter `yvar' `xvar', mc(blue%50) msymbol(Oh)) ///
+	   , ///
+	   xtitle(" ",size(small)) ytitle(" ",size(small)) legend(off) ///
+	   fysize(100) ///
+	   fxsize(100) ///
+	   xline(`xmed',lp(dash) lc(black%50)) ///
+	   yline(`ymed',lp(dash) lc(black%50)) ///
+	   xtitle("`xvartext'",size(small))  ///
+	   ytitle("`yvartext'",size(small))  ///
+	   saving("$outputpath/Figures/tmp_f1.gph", replace) ///
+	   ylabel(`yvarrange' `ymed',labelminlen(5) labsize(vsmall) angle(90)) xlabel(`xvarrange' `xmed',grid gmax gmin labsize(vsmall)) ysc(alt) xsc(alt)
+		
+twoway (hist `xvar', lw(none) bc(blue%50)) ///
+	   , ///
+	   xtitle("",size(small))  ///
+	   ytitle(,size(small)) ///
+	   saving("$outputpath/Figures/tmp_f2.gph", replace) ///
+	   fysize(40) ///
+	   fxsize(100) ///
+	   xline(`xmed',lp(dash) lc(black%50)) ///
+	   yline(0,lp(solid) lc(black) lw(thin)) ///
+	   legend(off) ///
+	   ylabel(#3,labelminlen(5) labsize(vsmall) angle(90)) xlabel(`xvarrange',grid gmax gmin labsize(vsmall)) ysc(range(0 .) alt reverse) 
+	   
+twoway (hist `yvar', horiz lw(none) bc(blue%50)) ///
+	   , ///
+	   ytitle("",size(small))  ///
+	   xtitle(,size(small)) ///
+	   legend(off) /// 
+	   fxsize(40) ///
+	   fysize(100) ///
+	   yline(`ymed',lp(dash) lc(black%50)) ///
+	   xline(0,lp(solid) lc(black) lw(thin)) ///
+	   saving("$outputpath/Figures/tmp_f3.gph", replace) ///
+	   ylabel(`yvarrange',labelminlen(5) labsize(vsmall) angle(90)) xlabel(#3,grid gmax labsize(vsmall) format(%9.1g)) xsc(alt reverse)
+
+graph combine "$outputpath/Figures/tmp_f3" ///
+			  "$outputpath/Figures/tmp_f1" ///
+			  "$outputpath/Figures/tmp_f2", ///
+			  hole(3) imargin(0 0 0 0) ysize(10) xsize(10) 
+graph export "$outputpath/Figures/scatter3.png", replace 
+
+
+* Or, you can write it in a program 
+cap program drop fancy_scatter
+program fancy_scatter
+	syntax, xvar(str) xvartext(str) xvarrange(str) yvar(str) yvartext(str) yvarrange(str) fname(str)
+
+	qui su `xvar', de 
+	loc xmed = round(`r(p50)',0.1)
+	qui su `yvar', de 
+	loc ymed = round(`r(p50)', 0.1)
+	
+	twoway (scatter `yvar' `xvar', mc(blue%50) msymbol(Oh)) ///
+		   , ///
+		   xtitle(" ",size(small)) ytitle(" ",size(small)) legend(off) ///
+		   fysize(100) ///
+		   fxsize(100) ///
+		   xline(`xmed',lp(dash) lc(black%50)) ///
+		   yline(`ymed',lp(dash) lc(black%50)) ///
+		   xtitle("`xvartext'",size(small))  ///
+		   ytitle("`yvartext'",size(small))  ///
+		   saving("$outputpath/Figures/tmp_f1.gph", replace) ///
+		   ylabel(`yvarrange' `ymed',labelminlen(5) labsize(vsmall) angle(90)) xlabel(`xvarrange' `xmed',grid gmax gmin labsize(vsmall)) ysc(alt) xsc(alt)
+			
+	twoway (hist `xvar', lw(none) bc(blue%50)) ///
+		   , ///
+		   xtitle("",size(small))  ///
+		   ytitle(,size(small)) ///
+		   saving("$outputpath/Figures/tmp_f2.gph", replace) ///
+		   fysize(40) ///
+		   fxsize(100) ///
+		   xline(`xmed',lp(dash) lc(black%50)) ///
+		   yline(0,lp(solid) lc(black) lw(thin)) ///
+		   legend(off) ///
+		   ylabel(#3,labelminlen(5) labsize(vsmall) angle(90)) xlabel(`xvarrange',grid gmax gmin labsize(vsmall)) ysc(range(0 .) alt reverse) 
+		   
+	twoway (hist `yvar', horiz lw(none) bc(blue%50)) ///
+		   , ///
+		   ytitle("",size(small))  ///
+		   xtitle(,size(small)) ///
+		   legend(off) /// 
+		   fxsize(40) ///
+		   fysize(100) ///
+		   yline(`ymed',lp(dash) lc(black%50)) ///
+		   xline(0,lp(solid) lc(black) lw(thin)) ///
+		   saving("$outputpath/Figures/tmp_f3.gph", replace) ///
+		   ylabel(`yvarrange',labelminlen(5) labsize(vsmall) angle(90)) xlabel(#3,grid gmax labsize(vsmall) format(%9.1g)) xsc(alt reverse)
+
+	graph combine "$outputpath/Figures/tmp_f3" ///
+				  "$outputpath/Figures/tmp_f1" ///
+				  "$outputpath/Figures/tmp_f2", ///
+				  hole(3) imargin(0 0 0 0) ysize(10) xsize(10) 
+	graph export "$outputpath/Figures/`fname'.png", replace 
+end 
+
+fancy_scatter, xvar("popurban_share") xvartext("Urban Pop Share (%)") xvarrange("40(20)100") ///
+			   yvar("pop65p_share") yvartext(">65yo Pop Share") yvarrange("0(5)20") ///
+			   fname("scatter3_01") 
+
+fancy_scatter, xvar("pop5_17_share") xvartext("5-17yo Share (%)") xvarrange("15(5)25") ///
+			   yvar("pop18p_share") yvartext(">18yo Pop Share") yvarrange("60(5)80") ///
+			   fname("scatter3_02")
+
 
 **# Panel Data
 webuse nlswork, clear
