@@ -309,12 +309,12 @@ program add_stats
 		loc dvar = "ln_wage"
 	}
 	* dependent variable mean of the untreated:
-	su ln_wage if !union & e(sample) // e(sample) specifies the samples used in the previous regression.
+	su `dvar' if !union & e(sample) // e(sample) specifies the samples used in the previous regression.
 	loc tmp = trim("`: di %12.3g `r(mean)''")
 	estadd local ymean_untreat "`tmp'": est`counter'
 	
 	* dependent variable mean of the South:
-	su ln_wage if south & e(sample) // e(sample) specifies the samples used in the previous regression.
+	su `dvar' if south & e(sample) // e(sample) specifies the samples used in the previous regression.
 	loc tmp = trim("`: di %12.3g `r(mean)''")
 	estadd local ymean_south "`tmp'": est`counter'
 end 
