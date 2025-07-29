@@ -302,12 +302,38 @@ la var c_city "In City"
 la var south "In South"
 la var union "In Union"
 
+cap program drop add_stats // Add customized summary stat to each regression
+program add_stats
+	syntax, counter(int) [dvar(str)]
+	if "`dvar'"==""{
+		loc dvar = "ln_wage"
+	}
+	* dependent variable mean of the untreated:
+	su ln_wage if !union & e(sample) // e(sample) specifies the samples used in the previous regression.
+	loc tmp = trim("`: di %12.3g `r(mean)''")
+	estadd local ymean_untreat "`tmp'": est`counter'
+	
+	* dependent variable mean of the South:
+	su ln_wage if south & e(sample) // e(sample) specifies the samples used in the previous regression.
+	loc tmp = trim("`: di %12.3g `r(mean)''")
+	estadd local ymean_south "`tmp'": est`counter'
+end 
+
 eststo clear 
-eststo: reg ln_wage union, cluster(idcode)
-eststo: reg ln_wage union msp age c_city south, cluster(idcode)
-eststo: reghdfe ln_wage union msp age c_city south, abs(year) cluster(idcode)
-eststo: reghdfe ln_wage union msp age c_city south, abs(year idcode) cluster(idcode)
-eststo: reghdfe ln_wage union msp age c_city south i.ind_code, abs(year idcode) cluster(idcode)
+eststo est1: reg ln_wage union, cluster(idcode)
+add_stats, counter(1)
+
+eststo est2: reg ln_wage union msp age c_city south, cluster(idcode)
+add_stats, counter(2)
+
+eststo est3: reghdfe ln_wage union msp age c_city south, abs(year) cluster(idcode)
+add_stats, counter(3)
+
+eststo est4: reghdfe ln_wage union msp age c_city south, abs(year idcode) cluster(idcode)
+add_stats, counter(4)
+
+eststo est5: reghdfe ln_wage union msp age c_city south i.ind_code, abs(year idcode) cluster(idcode)
+add_stats, counter(5)
 
 //You can also give each specification a name, e.g., "eststo spec1: reg...". If you don't specify names, they are named est1, est2, ... by the order they are run. 
 
@@ -318,11 +344,11 @@ estadd local ife "Yes": est4 est5
 esttab est* ///
     using "$outputpath/Tables/regs.tex",replace ///
 	se(%10.4f) star(* 0.1 ** 0.05 *** 0.01) label  ///
-	stats(N ymean yfe ife, labels("Observations" "Dep Var Mean" "Year FE" "Individual FE") fmt(%10.0gc %10.1f)) ///
+	stats(N ymean ymean_untreat ymean_south yfe ife, labels("Observations" "Dep Var Mean" "\qquad --- Untreated" "\qquad --- South" "Year FE" "Individual FE") fmt(%10.0gc %10.1f)) ///
 	refcat(union "\emph{Controls}", below nolabel) ///
 	indicate("Occupation FE= *.ind_code", labels("Yes" "")) ///
 	nomti ///
-	mgroups("Without Fixed Effects" "With Fixed Effects", pattern(1 0 1 0 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) 
+	mgroups("\shortstack{Without \\ Fixed Effects}" "With Fixed Effects", pattern(1 0 1 0 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) 
 	
 **# Event Study with xtevent 
 * For the purpose of illustration, we keep observations that were surveyed for at least ten years, and fill in missing values for some key variables --- this may not be the correct thing to do in a real analysis.  
