@@ -272,10 +272,11 @@ webuse nlswork, clear
 xtset idcode year, yearly
 xtdes
 gen wage = exp(ln_wage) 
+replace year = year + 1900
 
 preserve 
 	collapse (mean) hours wage wks_ue, by(year)
-	replace year = year + 1900
+	
 	twoway (line hours year, lc(blue%70) yaxis(1)) ///
 		   (line wage year, lc(pink%70) lp(dash_dot) yaxis(2)) ///
 		   (line wks_ue year, lc(orange%70) lp(longdash) yaxis(3)) ///
@@ -293,6 +294,14 @@ preserve
 		   legend(off) graphregion(color(white) lstyle(none)) aspect(0.5)
 	graph export "$outputpath/Figures/line.png", replace 
 restore 
+
+**# How to save regression results into working dataset and make customized figures. This example also demonstrates how to set up a customized ado program.
+// You may use coefplot command to plot estimates after a regression, but it's not very flexible.  
+yearly_plot, fn("yearly_plot") ytitle("Log Wage") dvar("ln_wage") basey(1980) absvars("idcode") clustervar("idcode")
+// More exmples: 
+yearly_plot, fn("try") ytitle("Log Wage") dvar("ln_wage") basey(1980) absvars("idcode")
+yearly_plot, fn("try") ytitle("Log Wage") dvar("ln_wage") basey(1970) absvars("idcode occ_code") 
+yearly_plot, fn("try") ytitle("Work Hours") dvar("hours") basey(1980) absvars("idcode") ctrlvars("age")
 
 **# Regression Table
 * Label some variables. 
