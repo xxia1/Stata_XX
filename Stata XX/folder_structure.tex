@@ -31,7 +31,7 @@ For each project, I recommend separating its files into three big folders:
     \item \verb|/Codes|: contains your codes for analysis. They should be clearly named and indexed (e.g., \verb|01_...|, \verb|02_...|). In these codes, cleaned data sets are saved to \verb|/Data/derived|, and exhibits are saved in \verb|/Output|
     \item \verb|/Output|: contains \verb|/Tables| and \verb|/Figures| for exhibits produced by your codes. If you use Overleaf, this folder should be at \verb|/Dropbox/Apps/Overleaf/[Project Name]/|; if you use {\LaTeX} locally, this can be saved in the same place as the two folders above. 
 \end{itemize}
-There is also your {\LaTeX} script, in which the exhibits are linked to the path in \verb|\Output|. If you run {\LaTeX} locally, you may have the script saved in \verb|/Output/Tex/|; otherwise, the {\LaTeX} script should be in \verb|/Dropbox/Apps/Overleaf/[Project Name]/| alongside \verb|/Output|. 
+There is also your {\LaTeX} script, in which the exhibits are linked to the path in \verb|/Output|. If you run {\LaTeX} locally, you may have the script saved in \verb|/Output/Tex/|; otherwise, the {\LaTeX} script should be in \verb|/Dropbox/Apps/Overleaf/[Project Name]/| alongside \verb|/Output|. 
 
 Depending on the project size, one can also break things down into different tasks, with each task having its own set of code, exhibits, derived data files, and even {\LaTeX} report. I'd recommend trying different structures to find the one that works for you and your project. 
 
@@ -61,7 +61,7 @@ Depending on the project size, one can also break things down into different tas
     \draw[arrow, bend left=30] (data) to node[above] {Read Raw/Derived Data} (codes);
     \draw[arrow, bend right=-30] (codes) to node[below] {Save Derived Data} (data);
     \draw[arrow] (codes) -- (output) node[midway, below] {Save Exhibits};
-    \draw[arrow] (latex) -- (output) node[midway, below] {Read Exhibits};
+    \draw[arrow] (output) -- (latex) node[midway, below] {Read Exhibits};
     \end{tikzpicture}
     
     % \label{fig:enter-label}
