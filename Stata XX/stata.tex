@@ -4,7 +4,7 @@ In this section, I go over some basics and tools in Stata. It's really hard to d
 
 \subsection{Elephant in the Room, but Not Really}
 \label{sec_elepant}
-Let me start with the elephant in the room. The most often complaint I hear people say about Stata is that it can only work with one dataset at a time. This is only 10\% true. You can certainly --- and easily --- work with multiple datasets in Stata, with two sets of commands: \verb|preserve|/\verb|restore| and \verb|tempfile|. We will get to them later in this section. But first, let's see what that 10\%-true is about. 
+Let me start with the elephant in the room. The most common complaint I hear people say about Stata is that it can only work with one dataset at a time. This is only 10\% true. You can certainly --- and easily --- work with multiple datasets in Stata, with two sets of commands: \verb|preserve|/\verb|restore| and \verb|tempfile|. We will get to them later in this section. But first, let's see what that 10\%-true is about. 
 
 Stata has a very particular way of handling the datasets you work with. I'd like to imagine Stata as a desk:
 \begin{figure}[H]
@@ -109,7 +109,7 @@ And if you just want to load the whole dataset, just do
 
 The quotation marks on the dataset are not required, but I like to use them since they will make the dataset name show in a different color, so it's easier to tell it's a dataset. Also, if your file path has spaces in it, you have to add the quotation marks. More details are here: \url{https://www.stata.com/manuals/duse.pdf}
 
-Here should also be the place where I demonstrate how to load data in other formats: Excel, CSV, SAS, etc. But honestly, I never memorized how to do them. There is a simple way to figure out the syntax. In your main window, click \verb|File| at the upper left, then \verb|Import|. There you can find interactive windows to load many data formats. Once you are done specifying the settings in the window, you can see a command shown in the Results tab that corresponds to the settings you just specified. Copy that into your do file, then you are pretty much done. You can make adjustments on it as needed, e.g., changing the file/path name, adding \verb|clear| option, etc. By doing so, you don't have to memorize the syntax for importing each data format. Similar ways work for exporting files when you want to save your working data into a different data format. 
+Here should also be the place where I demonstrate how to load data in other formats: Excel, CSV, SAS, etc. But honestly, I never memorized how to do them. There is a simple way to figure out the syntax. In your main window, click \verb|File| at the upper left, then \verb|Import|. There you can find interactive windows to load many data formats. Once you are done specifying the settings in the window, you can see a command shown in the Results tab that corresponds to the settings you just specified. Copy that into your do file, then you are pretty much done. You can make adjustments to it as needed, e.g., changing the file/path name, adding \verb|clear| option, etc. By doing so, you don't have to memorize the syntax for importing each data format. Similar ways work for exporting files when you want to save your working data into a different data format. 
 
 \paragraph{\underline{keep} and  \underline{drop}} They can be used to keep/drop variables, as well as observations, depending on how you write the commands. If it's followed by variable names, it keeps/drops the variables. For example, \verb|keep v1 v2 x*| drop all variables in the working dataset except for variables \verb|v1|, \verb|v2|, and all variables whose name starts with \verb|x|. On the flip side, \verb|drop v1 v2 x*| drops these variables from the data set. 
 
@@ -222,7 +222,7 @@ After running it, it will show you a summary stats the merge: how many observati
 \end{verbatim}
 In this case, if Stata finds any observations in the master data that are not matched with any observations in the using data, it will report an error and stop. This helps you check problems in the code. 
 
-You can also specify what categories to keep using option \verb|keep()|, and tell Stata not to generate \verb|_merge| by adding \verb|nogen| option. However, if you have, say \verb|keep(1 3)|, the output window will not show how many observations in the using data that are not matched (it will just say 0 observations in category 2), which may mask some problems. Therefore, \verb|keep()| and \verb|nogen| are not recommended unless you are certain what you are doing, and ideally accompany it with the \verb|assert()| option. 
+You can also specify what categories to keep using the option \verb|keep()|, and tell Stata not to generate \verb|_merge| by adding \verb|nogen| option. However, if you have, say \verb|keep(1 3)|, the output window will not show how many observations in the using data that are not matched (it will just say 0 observations in category 2), which may mask some problems. Therefore, \verb|keep()| and \verb|nogen| are not recommended unless you are certain what you are doing, and ideally accompany it with the \verb|assert()| option. 
 
 If the master and the using datasets have variables that are not key but have the same name, the default would keep the variable from the master dataset. You can instead tell Stata to \verb|update| or \verb|replace|. See more details here: \url{https://www.stata.com/manuals/dmerge.pdf}.
 
@@ -356,7 +356,7 @@ Perhaps the only practical constraint this adds is when you want to open two dat
 
 \paragraph{\underline{preserve/restore}} This is the little shelf at the top of the desk in \Cref{fig_desk}. See \Cref{sec_elepant} for the description. 
 
-\paragraph{\underline{tempfile}} Here I explain how to use \verb|tempfile| in detail. At any point of the program, you can initiate a temporary file by typing
+\paragraph{\underline{tempfile}} Here I explain how to use \verb|tempfile| in detail. At any point in the program, you can initiate a temporary file by typing
 \begin{verbatim}
     tempfile my_tempfile1 
 \end{verbatim}
@@ -395,6 +395,8 @@ When saving tempfiles, as in saving a normal dataset in storage, you can add \ve
 \end{verbatim}
 
 There may be cases where you have to use \verb|replace| --- e.g., appending files in a loop --- then just double-check that the name is correctly spelled. Or you can write \verb|confirm file `your_tempfile_name'| to make sure that file exists before \verb|save `your_tempfile_name', replace|; if the name is misspelled here, \verb|confirm file| would report an error. But still, you may only have a typo in the save line, so just be careful.
+
+\paragraph{\underline{Data frames}} This is a new function added to Stata in recent years, specifically to address people's complaints about working with multiple datasets. Personally, I never used it and haven't found a scenario where I needed to use it. If you want to learn more, check out: \url{https://www.stata.com/features/overview/multiple-datasets-in-memory/}.
 
 \subsection{Code Example \#1: Data Cleaning and Manipulation}
 Let's take a stock and go to the code 
@@ -669,7 +671,7 @@ Stata reads each line separately, unlike some other languages like SQL, where yo
 \end{verbatim}
 Notice that you have to have a space before every \verb|///|. 
 
-Finally, you can add a bookmark into your script by typing \verb|**# your_bookmark_name|. It will then allow you to jump to any bookmark from the drop-up list at the bottom of the Do File Editor. 
+Finally, you can add a bookmark into your script by typing \verb|**# your_bookmark_name|. It will then allow you to jump to any bookmark from the drop-up list at the bottom of the Do File Editor. If you can't find the drop-up list at the bottom of the window, try going to \verb|View-Show Navigator|.
 
 \subsection{Code Example \#2: Exhibits}
 Let's go to the code
@@ -721,8 +723,8 @@ Lastly, for each exhibit, there are some options for which I do not provide expl
     \caption{Scatter Plot}
     %\label{fig:enter-label}
     \begin{center}
-        \subfigure[Version 1: Customized Markers]{\includegraphics[width=0.49\textwidth]{Output/Figures/scatter1.png}} 
-        \subfigure[Version 2: Marker Size Depends on Total Population]{\includegraphics[width=0.49\textwidth]{Output/Figures/scatter2.png}} 
+        \subfigure[Version 1: Customized Markers]{\includegraphics[width=0.9\textwidth]{Output/Figures/scatter1.png}} \\ 
+        \subfigure[Version 2: Marker Size Depends on Total Population]{\includegraphics[width=0.9\textwidth]{Output/Figures/scatter2.png}} 
     \end{center}
 \end{figure}
 
@@ -732,6 +734,13 @@ Lastly, for each exhibit, there are some options for which I do not provide expl
     %\label{fig:enter-label}
     \includegraphics[width=0.9\linewidth]{Output/Figures/scatter3.png}
     \caption*{\scriptsize\textbf{Note:} Dashed line indicate medians.}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \caption{Plot using regression results}
+    %\label{fig:enter-label}
+    \includegraphics[width=0.9\linewidth]{Output/Figures/yearly_plot.png}\caption*{\scriptsize\textbf{Note:} This example demonstrates saving regression results to the working dataset, and making plots using ado programs. Check out the code.}
 \end{figure}
 
 \begin{figure}[H]
